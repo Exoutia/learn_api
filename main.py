@@ -76,3 +76,16 @@ def delete_post(post_id: int):
     else:
         del my_posts[post_id]
         return
+
+
+@app.put("/posts/{post_id}", status_code=status.HTTP_202_ACCEPTED)
+def update_post(post_id: int, post: Post):
+    if post_id not in my_posts:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id {post_id} not found",
+        )
+    else:
+        post_dict = post.dict()
+        my_posts[post_id] = post_dict
+        return {"message": "post updated successfully", "data": post_dict}
