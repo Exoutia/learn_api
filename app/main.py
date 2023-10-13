@@ -5,7 +5,7 @@ from random import randint
 
 app = FastAPI()
 
-
+# TODO: continue from here https://youtu.be/0sOvCWFmrtA?t=8508 
 class Post(BaseModel):
     title: str
     content: str

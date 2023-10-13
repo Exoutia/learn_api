@@ -37,3 +37,5 @@
 - Today let us create a `CRUD`(Create Read Update Delete) application by using `FastAPI`.
 - CRUD is define as property of an application that create, read, update and delete the data in the application or server.
 - Order matters as `FastAPI` looks for the path from start to bottom so if any pattern matches before the actual path then it will run it without any care.
+- Use `FastAPI` and its module `status` with `HTTPException` to raise error in HTTP code.
+- pass status code to the methods of application while creating it.
