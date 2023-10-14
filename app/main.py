@@ -1,11 +1,13 @@
 from fastapi import FastAPI, status, HTTPException
 from pydantic import BaseModel
-from random import randint
-
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from time import sleep
+from uuid import uuid4
 
 app = FastAPI()
 
-# TODO: continue from here https://youtu.be/0sOvCWFmrtA?t=8508 
+
 class Post(BaseModel):
     title: str
     content: str
@@ -13,26 +15,20 @@ class Post(BaseModel):
     rating: int | None = None
 
 
-my_posts = {
-    1: {
-        "title": "post 1",
-        "content": "this is the content of post 1",
-        "published": True,
-        "rating": 4,
-    },
-    2: {
-        "title": "post 2",
-        "content": "this is the content of post 2",
-        "published": True,
-        "rating": 5,
-    },
-    3: {
-        "title": "post 3",
-        "content": "this is the content of post 3",
-        "published": True,
-        "rating": 3,
-    },
-}
+while True:
+    try:
+        conn = psycopg2.connect(
+            host="localhost",
+            database="learn_api",
+            user="postgres",
+            cursor_factory=RealDictCursor,
+        )
+        cursor = conn.cursor()
+        print("database connection was successful")
+        break
+    except psycopg2.Error as e:
+        print(f"I am unable to connect to the database {e}")
+        sleep(2)
 
 
 @app.get("/")
@@ -42,21 +38,36 @@ def say_hello():
 
 @app.get("/posts")
 def get_posts():
+    cursor.execute("SELECT * FROM posts")
+    my_posts = cursor.fetchall()
     return {"data": my_posts}
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_post(post: Post):
-    print(post)
-    post_dict = post.dict()
-    id = randint(4, 100_000_000)
-    my_posts[id] = post_dict
-    return {"post_id": id, "post that you created": post_dict}
+    uuid = str(uuid4())
+    title = post.title
+    content = post.content
+    published = post.published
+    rating = post.rating
+    cursor.execute(
+        """INSERT INTO posts (uuid, title, content, published, rating)
+        VALUES (%s, %s, %s, %s, %s) RETURNING *""",
+        (uuid, title, content, published, rating),
+    )
+    post_created = cursor.fetchone()
+    cursor.commit()
+    return {
+        "post_u_id": post_created["uuid"],
+        "post_id": post_created["id"],
+        "data": post_created,
+    }
 
 
 @app.get("/posts/{post_id}")
 def get_post(post_id: int):
-    post = my_posts.get(post_id)
+    cursor.execute("SELECT * FROM posts WHERE id = %s", (post_id,))
+    post = cursor.fetchone()
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -68,24 +79,30 @@ def get_post(post_id: int):
 
 @app.delete("/posts/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(post_id: int):
-    if post_id not in my_posts:
+    cursor.execute("DELETE FROM posts WHERE id = %s RETURNING *", (post_id,))
+    post = cursor.fetchone()
+    print(post)
+    if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id {post_id} not found",
         )
     else:
-        del my_posts[post_id]
         return
 
 
 @app.put("/posts/{post_id}", status_code=status.HTTP_202_ACCEPTED)
 def update_post(post_id: int, post: Post):
-    if post_id not in my_posts:
+    cursor.execute(
+        """UPDATE posts SET title = %s, content = %s
+            WHERE id = %s RETURNING *""",
+        (post.title, post.content, post_id),
+    )
+    updated_post = cursor.fetchone()
+    if updated_post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id {post_id} not found",
         )
     else:
-        post_dict = post.dict()
-        my_posts[post_id] = post_dict
-        return {"message": "post updated successfully", "data": post_dict}
+        return {"message": "post updated successfully", "data": updated_post}

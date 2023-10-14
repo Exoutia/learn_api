@@ -7,6 +7,7 @@
   - [11/10/2023](#11102023)
     - [Why we need schema](#why-we-need-schema)
   - [12/10/2023](#12102023)
+  - [13/10/2023](#13102023) - [Primary Key](#primary-key) - [Unique Constraints](#unique-constraints) - [Null Constraints](#null-constraints)
   <!--toc:end-->
 
 ## `FastAPI`
@@ -39,3 +40,43 @@
 - Order matters as `FastAPI` looks for the path from start to bottom so if any pattern matches before the actual path then it will run it without any care.
 - Use `FastAPI` and its module `status` with `HTTPException` to raise error in HTTP code.
 - pass status code to the methods of application while creating it.
+
+## 13/10/2023
+
+- We are going to learn about databases.
+- Database is a arrangement method of storing data in such a way that it can be properly queried and retrieved.
+- By default every `Postgress` installation includes one database already created called `Postgres`.
+- This is important because `Postgres` requires you to specify the name of a database to make a connection. So there needs to always be one database.
+- A table represents a subject or event in an application.
+- A table is made up of columns and rows.
+- Each column represents a different attribute.
+- Each row represents a different entry in the table.
+- Databases have datatypes just such as any other programming language.
+
+  | Data Type | Postgres                | Python     |
+  | --------- | ----------------------- | ---------- |
+  | Numeric   | int, decimal, precision | int, float |
+  | Text      | varchar, text           | string     |
+  | Bool      | boolean                 | boolean    |
+  | Sequence  | array                   | list       |
+
+### Primary Key
+
+- Primary key is a column or group of columns that uniquely identifies each row in a table.
+- Table can have one and only one primary key.
+
+### Unique Constraints
+
+- A Unique constraint can be applied to any column to make sure every record has a unique value for that column.
+
+### Null Constraints
+
+- By default, when adding a new entry to a database, any column can be left blank. When a column can be left blank. When a column is left blank, it has a null value.
+- If we need column to be properly filled in to create a new record, a NOT NULL constraint can be added to the column to ensure that the column is never left blank.
+
+## 14/10/2023
+
+- Today we learned about many things from `psql` commands to alter to change the column and update the data.
+- Update command needs set to do any update.
+- Alter is used to change the table structure such as adding column.
+- Returning is used to get the table changes from deletion and updating.
