@@ -1,14 +1,19 @@
 # Notes
 
 <!--toc:start-->
-
 - [Notes](#notes)
   - [`FastAPI`](#fastapi)
   - [11/10/2023](#11102023)
     - [Why we need schema](#why-we-need-schema)
   - [12/10/2023](#12102023)
-  - [13/10/2023](#13102023) - [Primary Key](#primary-key) - [Unique Constraints](#unique-constraints) - [Null Constraints](#null-constraints)
-  <!--toc:end-->
+  - [13/10/2023](#13102023)
+    - [Primary Key](#primary-key)
+    - [Unique Constraints](#unique-constraints)
+    - [Null Constraints](#null-constraints)
+  - [14/10/2023](#14102023)
+    - [Object Relational Mapper (ORM)](#object-relational-mapper-orm)
+      - [`SQLALCHEMY`](#sqlalchemy)
+<!--toc:end-->
 
 ## `FastAPI`
 
@@ -80,3 +85,14 @@
 - Update command needs set to do any update.
 - Alter is used to change the table structure such as adding column.
 - Returning is used to get the table changes from deletion and updating.
+
+### Object Relational Mapper (ORM)
+
+- Layer of abstraction that sits between the database and us.
+- We can perform all database operation through traditional python code. No more SQL!.
+
+#### `SQLALCHEMY`
+
+- Sqlalchemy is one of the most popular python ORMs.
+- It is a standalone library and has no association with `FastAPI`. It can be used with any other python web frameworks or any python based application.
+- `Sqlalchemy` always need a driver to talk to any database such as for `postgresql` it need `psycopg2` 

@@ -1,9 +1,15 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Depends
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from time import sleep
 from uuid import uuid4
+from . import models
+from .database import engine, get_db
+from sqlalchemy.orm import Session
+
+models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
@@ -37,31 +43,32 @@ def say_hello():
 
 
 @app.get("/posts")
-def get_posts():
-    cursor.execute("SELECT * FROM posts")
-    my_posts = cursor.fetchall()
+def get_posts(db: Session = Depends(get_db)):
+    my_posts = db.query(models.Post).all()
     return {"data": my_posts}
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post):
-    uuid = str(uuid4())
+def create_post(post: Post, db: Session = Depends(get_db)):
     title = post.title
     content = post.content
     published = post.published
     rating = post.rating
-    cursor.execute(
-        """INSERT INTO posts (uuid, title, content, published, rating)
-        VALUES (%s, %s, %s, %s, %s) RETURNING *""",
-        (uuid, title, content, published, rating),
+    # cursor.execute(
+    #     """INSERT INTO posts (uuid, title, content, published, rating)
+    #     VALUES (%s, %s, %s, %s, %s) RETURNING *""",
+    #     (uuid, title, content, published, rating),
+    # )
+    # post_created = cursor.fetchone()
+    # cursor.commit()
+
+    new_post = models.Post(
+        title=title, content=content, published=published, rating=rating
     )
-    post_created = cursor.fetchone()
-    cursor.commit()
-    return {
-        "post_u_id": post_created["uuid"],
-        "post_id": post_created["id"],
-        "data": post_created,
-    }
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return {"message": "post created successfully", "data": new_post}
 
 
 @app.get("/posts/{post_id}")
