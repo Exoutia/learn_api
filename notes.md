@@ -1,6 +1,7 @@
 # Notes
 
 <!--toc:start-->
+
 - [Notes](#notes)
   - [`FastAPI`](#fastapi)
   - [11/10/2023](#11102023)
@@ -13,7 +14,8 @@
   - [14/10/2023](#14102023)
     - [Object Relational Mapper (ORM)](#object-relational-mapper-orm)
       - [`SQLALCHEMY`](#sqlalchemy)
-<!--toc:end-->
+  - [15/10/2023](#15102023)
+  <!--toc:end-->
 
 ## `FastAPI`
 
@@ -95,4 +97,21 @@
 
 - Sqlalchemy is one of the most popular python ORMs.
 - It is a standalone library and has no association with `FastAPI`. It can be used with any other python web frameworks or any python based application.
-- `Sqlalchemy` always need a driver to talk to any database such as for `postgresql` it need `psycopg2` 
+- `Sqlalchemy` always need a driver to talk to any database such as for `postgresql` it need `psycopg2`
+
+## 15/10/2023
+
+- Today I got to learn about how to do crud operation using `sqlalchmey`.
+- To read any data we just need to arrange the commands this way. `query(name of mode).filter(the condition).all()/first()/etc`.
+- To update or delete you had to get the query then run that using the `query.update of delete`.
+- Now something to learn about that is `psycopg2` need to have it to work with postgresql.
+
+### Schema Models
+
+- Schema or Pydantic Models define the structure of a request and response.
+- This ensure that when a user wants to create a post, the request will only go through if it has a 'title' and 'content' in the body.
+
+## 17/10/2023
+
+- Today I created schema model and everything for my api, using Python `Pydantic` module.
+- Everything is working perfectly.
