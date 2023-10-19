@@ -1,10 +1,12 @@
-from fastapi import FastAPI, status, HTTPException, Depends
-from . import models
-from .schema import Post, CreatePost, UpdatePost
-from .database import engine, get_db
-from sqlalchemy.orm import Session
 from typing import List
-import bcrypt
+
+from fastapi import Depends, FastAPI, HTTPException, status
+from sqlalchemy.orm import Session
+
+from . import models
+from .database import engine, get_db
+from .schema import CreatePost, CreateUser, Post, UpdatePost, User
+from .utils import hash_password
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -79,4 +81,35 @@ def update_post(post_id: int, post: UpdatePost, db: Session = Depends(get_db)) -
         return updated_post
 
 
+@app.get("/users", response_model=List[User])
+def get_users(db: Session = Depends(get_db)):
+    my_users = db.query(models.User).all()
+    print(my_users)
+    return my_users
 
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=User)
+def create_user(user: CreateUser, db: Session = Depends(get_db)):
+    username = user.username
+    email = user.email
+    password = user.password
+    salt, hashed_password = hash_password(password)
+    new_user = models.User(
+        username=username, email=email, salt=salt, password=hashed_password
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+@app.get("/users/{user_id}", response_model=User)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"user with id {user_id} not found",
+        )
+    else:
+        return user

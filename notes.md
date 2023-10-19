@@ -115,3 +115,9 @@
 
 - Today I created schema model and everything for my api, using Python `Pydantic` module.
 - Everything is working perfectly.
+
+## 19/10/2023
+
+- For past two days I was busy with roaming and enjoying the holiday season so didn't do much.
+- But today i completed the user model with salting and every password properly stored in it.
+- I used `bcrypt` for that.

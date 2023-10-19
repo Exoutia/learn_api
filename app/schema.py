@@ -1,5 +1,6 @@
-from pydantic import BaseModel, UUID4
 from datetime import datetime
+
+from pydantic import UUID4, BaseModel, EmailStr
 
 
 class PostBase(BaseModel):
@@ -25,3 +26,24 @@ class CreatePost(PostBase):
 
 class UpdatePost(PostBase):
     pass
+
+
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+
+
+class User(UserBase):
+    uuid: UUID4
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CreateUser(UserBase):
+    password: str
+
+    class Config:
+        from_attributes = True
