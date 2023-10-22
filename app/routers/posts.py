@@ -1,0 +1,88 @@
+from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from .. import models
+from ..database import get_db
+from ..schema import CreatePost, Post, UpdatePost
+
+from ..oauth2 import get_current_user
+
+router = APIRouter(
+    prefix="/posts",
+    tags=["Posts"],
+)
+
+
+@router.get("/")
+def get_posts(db: Session = Depends(get_db), response_model=List[Post]) -> List[Post]:
+    my_posts = db.query(models.Post).all()
+    return my_posts
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post)
+def create_post(
+    post: CreatePost,
+    db: Session = Depends(get_db),
+    user: str = Depends(get_current_user),
+):
+    user_uid = user.uuid
+    title = post.title
+    content = post.content
+    published = post.published
+    new_post = models.Post(
+        title=title, content=content, published=published, user_uid=user_uid
+    )
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return new_post
+
+
+@router.get("/{post_id}", response_model=Post)
+def get_post(post_id: int, db: Session = Depends(get_db)) -> Post:
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id {post_id} not found",
+        )
+    else:
+        return post
+
+
+@router.delete("/{post_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(
+    post_id: int,
+    db: Session = Depends(get_db),
+    username: str = Depends(get_current_user),
+) -> None:
+    query = db.query(models.Post).filter(models.Post.id == post_id)
+    if query.first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id {post_id} not found",
+        )
+    else:
+        # to remember to delete post wejust need query not the row.
+        query.delete(synchronize_session=False)
+        db.commit()
+        return
+
+
+@router.put("/{post_id}", status_code=status.HTTP_202_ACCEPTED, response_model=Post)
+def update_post(post_id: int, post: UpdatePost, db: Session = Depends(get_db)) -> Post:
+    query = db.query(models.Post).filter(models.Post.id == post_id)
+    updated_post = query.first()
+
+    if updated_post is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"post with id {post_id} not found",
+        )
+    else:
+        query.update(post.dict(), synchronize_session=False)
+        db.commit()
+        updated_post = query.first()
+        return updated_post

@@ -14,6 +14,7 @@ class Post(PostBase):
     id: int
     rating: int | None = None
     created_at: datetime
+    user_uid: UUID4
 
     class Config:
         from_attributes = True
@@ -47,3 +48,12 @@ class CreateUser(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None

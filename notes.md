@@ -1,7 +1,6 @@
 # Notes
 
 <!--toc:start-->
-
 - [Notes](#notes)
   - [`FastAPI`](#fastapi)
   - [11/10/2023](#11102023)
@@ -15,7 +14,12 @@
     - [Object Relational Mapper (ORM)](#object-relational-mapper-orm)
       - [`SQLALCHEMY`](#sqlalchemy)
   - [15/10/2023](#15102023)
-  <!--toc:end-->
+    - [Schema Models](#schema-models)
+  - [17/10/2023](#17102023)
+  - [19/10/2023](#19102023)
+    - [JWT tokens](#jwt-tokens)
+  - [22/10/2023](#22102023)
+<!--toc:end-->
 
 ## `FastAPI`
 
@@ -121,3 +125,15 @@
 - For past two days I was busy with roaming and enjoying the holiday season so didn't do much.
 - But today i completed the user model with salting and every password properly stored in it.
 - I used `bcrypt` for that.
+- I used `Fastapi.APIRouter` to make the code bit more organised this way every route can have its own seperate file like django router function that I used to use.
+
+### JWT tokens
+
+- JWT are used to authenticate users and store some basic information securely.
+- In jwt there are three parts first the header, second the payload(some simple things like name and etc), thrid the secret hash that was calculated or generated using some hash.
+- JWT is stored on client machine and it is great to authenticate users.
+
+## 22/10/2023
+
+- I learned about the python jose module which is used to do jwt authentication.
+- I created function and learned how jwt is used for sessioning of user and keep them logged in browser and how this is used in fastapi.

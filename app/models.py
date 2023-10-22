@@ -1,7 +1,14 @@
 from uuid import uuid4
 
-from sqlalchemy import (Boolean, CheckConstraint, Column, Integer, Sequence,
-                        String)
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Column,
+    Integer,
+    Sequence,
+    ForeignKey,
+    String,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -24,6 +31,9 @@ class Post(Base):
     rating = Column(Integer, nullable=True)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+    user_uid = Column(
+        UUID(as_uuid=True), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
     )
     __table_args__ = (
         CheckConstraint("rating >= 0 and rating <= 5", name="check_rating_range"),

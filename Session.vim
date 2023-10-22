@@ -13,10 +13,11 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +24 app/main.py
+badd +12 /tmp/tmpla58ftls.py
 argglobal
 %argdel
-edit app/main.py
+$argadd /tmp/tmpla58ftls.py
+edit /tmp/tmpla58ftls.py
 argglobal
 setlocal fdm=manual
 setlocal fde=0
@@ -28,13 +29,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 24 - ((23 * winheight(0) + 26) / 53)
+let s:l = 12 - ((11 * winheight(0) + 26) / 52)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 24
-normal! 0
-lcd ~/study/learn_api
+keepjumps 12
+normal! 019|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

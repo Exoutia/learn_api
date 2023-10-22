@@ -1,11 +1,20 @@
+# SQLALCHEMY_DATABASE_URL =
+# "postgresql://<username>:<password>@<ip-address>/hostname:5432/<database-name>"
+from os import getenv
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# SQLALCHEMY_DATABASE_URL =
-# "postgresql://<username>:<password>@<ip-address>/hostname:5432/<database-name>"
+load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres@localhost/learn_api"
+USERNAME = getenv("POSTGRES_USER")
+HOST = getenv("POSTGRES_HOST")
+DB = getenv("POSTGRES_DB")
+
+
+SQLALCHEMY_DATABASE_URL = f"postgresql://{USERNAME}@{HOST}/{DB}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
