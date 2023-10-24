@@ -9,6 +9,7 @@ from sqlalchemy import (
     ForeignKey,
     String,
 )
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
@@ -35,6 +36,7 @@ class Post(Base):
     user_uid = Column(
         UUID(as_uuid=True), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
     )
+    user = relationship("User")
     __table_args__ = (
         CheckConstraint("rating >= 0 and rating <= 5", name="check_rating_range"),
     )

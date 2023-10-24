@@ -1,0 +1,7 @@
+default:
+  @just --list
+
+jwt:
+  @http --form post :8000/login username=admin password=admin > adminLogin.json && \
+  source $(poetry env info -p)/bin/activate && \
+  python ../misc_scripts/making_header_file.py
