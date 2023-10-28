@@ -28,7 +28,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.text("gen_random_uuid()"),
         ),
-        sa.Column("id", sa.Integer, sa.Sequence('post_seq_id'), nullable=False),
+        sa.Column("id", sa.Integer, sa.Sequence("post_seq_id"), nullable=False),
         sa.Column("title", sa.String(255), nullable=False),
     )
     pass
