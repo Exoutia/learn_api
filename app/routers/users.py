@@ -23,10 +23,8 @@ def create_user(user: CreateUser, db: Session = Depends(get_db)) -> User:
     username = user.username
     email = user.email
     password = user.password
-    salt, hashed_password = hash_password(password)
-    new_user = models.User(
-        username=username, email=email, salt=salt, password=hashed_password
-    )
+    hashed_password = hash_password(password)
+    new_user = models.User(username=username, email=email, password=hashed_password)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

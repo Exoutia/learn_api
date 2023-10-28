@@ -1,16 +1,14 @@
-from uuid import uuid4
-
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    ForeignKey,
     Integer,
     Sequence,
-    ForeignKey,
     String,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
@@ -23,7 +21,7 @@ class Post(Base):
     uuid = Column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid4,
+        server_default=text("gen_random_uuid()"),
     )
     id = Column(Integer, Sequence("post_id_seq"))
     title = Column(String, nullable=False)
@@ -47,16 +45,36 @@ class User(Base):
     uuid = Column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid4,
+        server_default=text("gen_random_uuid()"),
     )
     id = Column(Integer, Sequence("user_id_seq"))
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
-    salt = Column(String, nullable=False)
     password = Column(String, nullable=False)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
 
     def __repr__(self):
-        return f"<User {self.username},\nEmail {self.email},\ncreated_at {self.created_at},\nid {self.id},\nuuid {self.uuid},\nsalt {self.salt},\npassword {self.password}>"
+        return f"""<User {self.username},
+                    \ncreated_at {self.created_at},
+                    \nid {self.id},
+                    \nuuid {self.uuid},
+                >
+                """
+
+
+class Vote(Base):
+    __tablename__ = "votes"
+    post_uid = Column(
+        UUID(as_uuid=True),
+        ForeignKey("posts.uuid", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user_uid = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.uuid", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    user = relationship("User")
+    post = relationship("Post")

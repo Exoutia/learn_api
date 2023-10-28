@@ -34,13 +34,21 @@ class PostBase(BaseModel):
     published: bool = True
 
 
-class Post(PostBase):
+class PostOut(PostBase):
     uuid: UUID4
     id: int
     rating: int | None = None
     created_at: datetime
     user_uid: UUID4
     user: PostUserOut
+
+    class Config:
+        from_attributes = True
+
+
+class PostOutWithVote(BaseModel):
+    Post: PostOut
+    votes: int
 
     class Config:
         from_attributes = True
@@ -62,3 +70,26 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class Vote(BaseModel):
+    post_uid: UUID4
+    dir: bool
+
+
+class UserInsideVote(PostUserOut):
+    pass
+
+
+class PostInsideVote(PostBase):
+    pass
+
+
+class VoteRow(BaseModel):
+    post_uid: UUID4
+    user_uid: UUID4
+    user: PostUserOut
+    post: PostInsideVote
+
+    class Config:
+        from_attributes = True

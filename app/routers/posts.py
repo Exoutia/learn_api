@@ -1,38 +1,47 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .. import models
 from ..database import get_db
-from ..schema import CreatePost, Post, UpdatePost
-
 from ..oauth2 import get_current_user
+from ..schema import CreatePost, PostOut, PostOutWithVote, UpdatePost
 
 router = APIRouter(
     prefix="/posts",
     tags=["Posts"],
 )
 
+# TODO: continue from here : https://youtu.be/0sOvCWFmrtA?t=38087 and connect alembic to my api.
 
-@router.get("/", response_model=List[Post])
+
+# @router.get("/")
+@router.get("/", response_model=List[PostOutWithVote])
 def get_posts(
     db: Session = Depends(get_db),
     limit: int = 10,
     skip: int = 0,
     search: str | None = None,
-) -> List[Post]:
+):
     limit = min(limit, 100)
+    join_query = (
+        db.query(models.Post, func.count(models.Post.uuid).label("votes"))
+        .join(models.Vote)
+        .group_by(models.Post.uuid)
+    )
     if search:
         all_posts = (
-            db.query(models.Post)
-            .filter(models.Post.title.contains(search))
+            join_query.filter(models.Post.title.contains(search))
             .offset(skip)
             .limit(limit)
             .all()
         )
     else:
-        all_posts = db.query(models.Post).offset(skip).limit(limit).all()
+        all_posts = join_query.offset(skip).limit(limit).all()
+
+    print(join_query)
     if not all_posts:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="no posts found"
@@ -40,7 +49,7 @@ def get_posts(
     return all_posts
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Post)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=PostOut)
 def create_post(
     post: CreatePost,
     db: Session = Depends(get_db),
@@ -59,19 +68,25 @@ def create_post(
     return new_post
 
 
-@router.get("/myPosts", response_model=List[Post])
+@router.get("/myPosts", response_model=List[PostOutWithVote])
 def get_users_post(
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
     limit: int = 10,
     skip: int = 0,
     search: str | None = None,
-) -> List[Post]:
+):
     limit = min(limit, 100)
+
+    join_query = (
+        db.query(models.Post, func.count(models.Post.uuid).label("votes"))
+        .join(models.Vote)
+        .group_by(models.Post.uuid)
+    )
+
     if search:
         my_posts = (
-            db.query(models.Post)
-            .filter(models.Post.title.contains(search))
+            join_query.filter(models.Post.title.contains(search))
             .filter(models.Post.user_uid == user.uuid)
             .offset(skip)
             .limit(limit)
@@ -79,8 +94,7 @@ def get_users_post(
         )
     else:
         my_posts = (
-            db.query(models.Post)
-            .filter(models.Post.user_uid == user.uuid)
+            join_query.filter(models.Post.user_uid == user.uuid)
             .offset(skip)
             .limit(limit)
             .all()
@@ -94,9 +108,14 @@ def get_users_post(
     return my_posts
 
 
-@router.get("/{post_id}", response_model=Post)
-def get_post(post_id: int, db: Session = Depends(get_db)) -> Post:
-    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+@router.get("/{post_id}", response_model=PostOutWithVote)
+def get_post(post_id: int, db: Session = Depends(get_db)):
+    join_query = (
+        db.query(models.Post, func.count(models.Post.uuid).label("votes"))
+        .join(models.Vote)
+        .group_by(models.Post.uuid)
+    )
+    post = join_query.filter(models.Post.id == post_id).first()
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -111,7 +130,7 @@ def delete_post(
     post_id: int,
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
-) -> None:
+):
     query = db.query(models.Post).filter(models.Post.id == post_id)
     post = query.first()
     if post is None:
@@ -131,13 +150,13 @@ def delete_post(
         return
 
 
-@router.put("/{post_id}", status_code=status.HTTP_202_ACCEPTED, response_model=Post)
+@router.put("/{post_id}", status_code=status.HTTP_202_ACCEPTED, response_model=PostOut)
 def update_post(
     post_id: int,
     post: UpdatePost,
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
-) -> Post:
+):
     query = db.query(models.Post).filter(models.Post.id == post_id)
     updated_post = query.first()
 
