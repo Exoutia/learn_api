@@ -10,3 +10,6 @@ app_run:
 	
 nvim:
   source $(poetry env info --path)/bin/activate  && nvim
+
+nvimh:
+  source $(poetry env info --path)/bin/activate  && neovide
