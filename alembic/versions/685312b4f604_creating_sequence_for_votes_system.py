@@ -25,14 +25,14 @@ def upgrade() -> None:
         sa.Column(
             "user_uid",
             sa.dialects.postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("posts.uuid", ondelete="CASCADE"),
+            sa.ForeignKey("users.uuid", ondelete="CASCADE"),
             primary_key=True,
             nullable=False,
         ),
         sa.Column(
             "post_uid",
             sa.dialects.postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("users.uuid", ondelete="CASCADE"),
+            sa.ForeignKey("posts.uuid", ondelete="CASCADE"),
             primary_key=True,
             nullable=False,
         ),

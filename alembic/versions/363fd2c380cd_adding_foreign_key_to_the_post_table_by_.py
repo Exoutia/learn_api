@@ -38,4 +38,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    pass
+    op.drop_column("posts", "user_uid"),
+    op.drop_constraint("post_user_fk", "posts", type_="foreignkey")

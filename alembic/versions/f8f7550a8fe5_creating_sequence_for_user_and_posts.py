@@ -24,4 +24,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    pass
+    op.execute(sa.schema.DropSequence(sa.Sequence("post_id_seq")))
+    op.execute(sa.schema.DropSequence(sa.Sequence("user_id_seq")))
