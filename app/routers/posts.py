@@ -14,8 +14,6 @@ router = APIRouter(
     tags=["Posts"],
 )
 
-# TODO: continue from here : https://youtu.be/0sOvCWFmrtA?t=38087 and connect alembic to my api.
-
 
 # @router.get("/")
 @router.get("/", response_model=List[PostOutWithVote])
@@ -27,8 +25,8 @@ def get_posts(
 ):
     limit = min(limit, 100)
     join_query = (
-        db.query(models.Post, func.count(models.Post.uuid).label("votes"))
-        .join(models.Vote)
+        db.query(models.Post, func.count(models.Vote.post_uid).label("votes"))
+        .join(models.Vote, isouter=True)
         .group_by(models.Post.uuid)
     )
     if search:
