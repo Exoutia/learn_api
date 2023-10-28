@@ -33,7 +33,6 @@ MANIFEST
 *.manifest
 *.spec
 
-tests/
 
 # Installer logs
 pip-log.txt
