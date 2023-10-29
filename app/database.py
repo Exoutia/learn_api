@@ -7,9 +7,9 @@ from .config import settings
 USERNAME = settings.POSTGRES_USER
 HOST = settings.POSTGRES_HOST
 DB = settings.POSTGRES_DB
+PASSWORD = settings.POSTGRES_PASSWORD
 
-
-SQLALCHEMY_DATABASE_URL = f"postgresql://{USERNAME}@{HOST}/{DB}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{USERNAME}:{PASSWORD}@{HOST}/{DB}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 

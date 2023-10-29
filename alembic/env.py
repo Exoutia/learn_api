@@ -11,7 +11,7 @@ from app.models import Base
 config = context.config
 config.set_main_option(
     "sqlalchemy.url",
-    f"postgresql://{settings.POSTGRES_USER}@{settings.POSTGRES_HOST}/{settings.POSTGRES_DB}",
+    f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}/{settings.POSTGRES_DB}",
 )
 
 # Interpret the config file for Python logging.
