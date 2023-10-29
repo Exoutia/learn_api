@@ -39,7 +39,6 @@ def get_posts(
     else:
         all_posts = join_query.offset(skip).limit(limit).all()
 
-    print(join_query)
     if not all_posts:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="no posts found"
