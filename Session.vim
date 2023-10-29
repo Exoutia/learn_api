@@ -13,17 +13,29 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +11 app/config.py
-badd +4 .env
-badd +61 alembic.ini
-badd +14 alembic/env.py
-badd +24 app/oauth2.py
-badd +12 app/database.py
+badd +12 app/main.py
 argglobal
 %argdel
-edit app/config.py
+edit app/main.py
+let s:save_splitbelow = &splitbelow
+let s:save_splitright = &splitright
+set splitbelow splitright
+wincmd _ | wincmd |
+split
+1wincmd k
+wincmd w
+let &splitbelow = s:save_splitbelow
+let &splitright = s:save_splitright
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe '1resize ' . ((&lines * 37 + 27) / 54)
+exe '2resize ' . ((&lines * 15 + 27) / 54)
 argglobal
-balt app/database.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -34,13 +46,39 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 11 - ((10 * winheight(0) + 26) / 52)
+let s:l = 12 - ((11 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 11
-normal! 026|
+keepjumps 12
+normal! 0
 lcd ~/study/learn_api
+wincmd w
+argglobal
+if bufexists(fnamemodify("term://~/study/learn_api//46388:/usr/bin/zsh", ":p")) | buffer term://~/study/learn_api//46388:/usr/bin/zsh | else | edit term://~/study/learn_api//46388:/usr/bin/zsh | endif
+if &buftype ==# 'terminal'
+  silent file term://~/study/learn_api//46388:/usr/bin/zsh
+endif
+balt ~/study/learn_api/app/main.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+let s:l = 2 - ((0 * winheight(0) + 7) / 15)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 2
+normal! 042|
+lcd ~/study/learn_api
+wincmd w
+2wincmd w
+exe '1resize ' . ((&lines * 37 + 27) / 54)
+exe '2resize ' . ((&lines * 15 + 27) / 54)
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -48,6 +86,8 @@ endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20
 let &shortmess = s:shortmess_save
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
